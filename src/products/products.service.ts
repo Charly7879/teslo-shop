@@ -32,20 +32,41 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return `This action returns all products`;
+  //TODO: Paginar
+  async findAll() {
+    return await this.productRepository.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string) {
+
+    let product: Product | null;
+
+    product = await this.productRepository.findOneBy({ id: id });
+
+    if (!product)
+      throw new InternalServerErrorException(`Product with id ${id} not found`);
+
+    return product;
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
     return `This action updates a #${id} product`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    try {
+
+      let product = await this.findOne(id);
+
+      let { affected } = await this.productRepository.delete({ id: product.id });
+
+      if (affected !== 0) {
+        throw new BadRequestException(`Product with id "${id}" not found`);
+      }
+
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
   /**
