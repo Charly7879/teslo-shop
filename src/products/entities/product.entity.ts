@@ -46,6 +46,14 @@ export class Product {
     })
     gender: string;
 
+    @Column({
+        type: 'text',
+        array: true,
+        default: [],
+    })
+    tags: string[];
+
+
     @BeforeInsert()
     checkSlogInsert() {
         if (!this.slug) {
