@@ -82,6 +82,7 @@ export class ProductsService {
       if (!product)
         throw new NotFoundException(`Product with id "${id}" not found`);
 
+      // Update data
       await this.productRepository.save(product);
 
       return product;
