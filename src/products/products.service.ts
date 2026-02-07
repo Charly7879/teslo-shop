@@ -100,27 +100,53 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
+
+    const { images, ...rest } = updateProductDto;
+
+    // Prepare
+    let product = await this.productRepository.preload({ id, ...rest });
+
+    if (!product)
+      throw new NotFoundException(`Product with id "${id}" not found`);
+
+    // 1. Create query runner
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    // 2. Conectar para realizar la transaction
+    await queryRunner.connect();
+
+    // 3. Inicializar transaction
+    await queryRunner.startTransaction();
+
     try {
 
-      const { images, ...rest } = updateProductDto;
+      if (images) {
+        // 4. Borrar imágenes
+        await queryRunner.manager.delete(ProductImage, { product: { id } });
 
-      // Prepare
-      let product = await this.productRepository.preload({
-        id,
-        ...rest,
-      });
+        // 5. Crear nuevas imágenes
+        product.images = images.map(image => this.productImageRepository.create({ url: image }));
+      }
 
-      if (!product)
-        throw new NotFoundException(`Product with id "${id}" not found`);
+      await queryRunner.manager.save(product);
 
-      // Create query runner
-      const queryRunner = this.dataSource.createQueryRunner();
+
+      // 6. Update data
+      await queryRunner.commitTransaction();
+
+      // 7. Desconectar query runner
+      await queryRunner.release();
 
       // Update data
-      await this.productRepository.save(product);
+      // await this.productRepository.save(product);
 
-      return product;
+      return this.findOnePlane(id);
     } catch (error) {
+
+      // Re hacer cambios
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+
       this.handleExceptions(error);
     }
   }
