@@ -57,7 +57,10 @@ export class Product {
     @OneToMany(
         (type) => ProductImage,
         (productImage) => productImage.product,
-        { cascade: true }
+        {
+            cascade: true,
+            eager: true, // Relacionar en find*
+        }
     )
     images?: ProductImage[];
 
