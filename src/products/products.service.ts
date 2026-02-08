@@ -152,16 +152,22 @@ export class ProductsService {
   }
 
   async remove(id: string) {
+    const product = await this.findOne(id);
+    await this.productRepository.remove(product);
+  }
+
+  /**
+   * Vacias tabla prodcts
+   * @returns void
+   */
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+
     try {
-
-      let product = await this.findOne(id);
-
-      let { affected } = await this.productRepository.delete({ id: product.id });
-
-      if (affected !== 0) {
-        throw new BadRequestException(`Product with id "${id}" not found`);
-      }
-
+      return await query
+        .delete()
+        .where({})
+        .execute();
     } catch (error) {
       this.handleExceptions(error);
     }
