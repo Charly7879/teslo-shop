@@ -11,7 +11,7 @@ export const GetUser = createParamDecorator(
      * @param ctx Context en dónde se ejecuta el decorator
      * @returns 
      */
-    (data, ctx: ExecutionContext) => {
+    (data: string, ctx: ExecutionContext) => {
 
         // Request
         const req = ctx.switchToHttp().getRequest();
@@ -22,6 +22,8 @@ export const GetUser = createParamDecorator(
         if (!user)
             throw new InternalServerErrorException('User not foun (request)');
 
-        return user;
+        return (!data)
+            ? user
+            : user[data];
     }
 );
