@@ -68,7 +68,7 @@ export class Product {
     @ManyToOne(
         () => User,
         (user) => user.products,
-        { eager: false }
+        { eager: true }
     )
     user: User;
 
