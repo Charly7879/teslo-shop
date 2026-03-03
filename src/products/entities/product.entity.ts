@@ -6,58 +6,88 @@ import { ApiProperty } from '@nestjs/swagger';
 @Entity({ name: 'products' })
 export class Product {
 
-    @ApiProperty()
+    @ApiProperty({
+        example: '34eb5fa3-dec1-44e1-86a6-6c30469806d1',
+        description: 'Product ID',
+        uniqueItems: true,
+    })
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'T-Shit Teslo',
+        description: 'Product title',
+        uniqueItems: true,
+    })
     @Column('text', {
         unique: true,
     })
     title: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 0,
+        description: 'Product price',
+    })
     @Column({
         type: 'float',
         default: 0,
     })
     price: number;
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'This is an example product descritpion',
+        description: 'Product description',
+    })
     @Column({
         type: 'text',
         default: null,
     })
     description: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'my-product-example',
+        description: 'Product slug',
+        uniqueItems: true,
+    })
     @Column({
         type: 'text',
         unique: true,
     })
     slug: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 0,
+        description: 'Product stock',
+    })
     @Column({
         type: 'int',
         default: 0,
     })
     stock: number;
 
-    @ApiProperty()
+    @ApiProperty({
+        example: ['SM', 'M', 'L', 'XL'],
+        description: 'Product sizes',
+    })
     @Column({
         type: 'text',
         array: true,
     })
     sizes: string[];
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'men',
+        description: 'Product genders',
+    })
     @Column({
         type: 'text',
     })
     gender: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        example: 'shirt',
+        description: 'Product tags',
+    })
     @Column({
         type: 'text',
         array: true,
@@ -65,7 +95,13 @@ export class Product {
     })
     tags: string[];
 
-    @ApiProperty()
+    @ApiProperty({
+        example: [
+            "1740290-00-A_0_2000.jpg",
+            "1740290-00-A_1.jpg"
+        ],
+        description: 'Product images',
+    })
     @OneToMany(
         (type) => ProductImage,
         (productImage) => productImage.product,
