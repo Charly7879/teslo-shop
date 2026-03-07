@@ -21,6 +21,11 @@ export class MessageWsService {
         private readonly userRepository: Repository<User>
     ) { }
 
+    /**
+     * Conectar usuario
+     * @param client Socket
+     * @param userId string
+     */
     async registerClient(client: Socket, userId: string) {
         const user = await this.userRepository.findOneBy({ id: userId });
 
@@ -28,6 +33,8 @@ export class MessageWsService {
 
         if (!user.isActive) throw new Error('User not active');
 
+        // Desconectar usuarios duplicados
+        this.checkUserConnection(user);
 
         this.connectedClients[client.id] = {
             socket: client,
@@ -45,6 +52,22 @@ export class MessageWsService {
 
     getUserFullName(socketId: string) {
         return this.connectedClients[socketId].user.fullName;
+    }
+
+    /**
+     * Desconectar usuarios duplicados
+     * @param user User
+     */
+    private checkUserConnection(user: User) {
+        for (const clientId of Object.keys(this.connectedClients)) {
+
+            const connectedClient = this.connectedClients[clientId];
+
+            if (connectedClient.user.id === user.id) {
+                connectedClient.socket.disconnect();
+                break;
+            }
+        }
     }
 
 }
