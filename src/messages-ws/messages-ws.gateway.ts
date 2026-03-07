@@ -22,21 +22,21 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
   ) { }
 
   // Called automatically when a client connects
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
 
     const token = client.handshake.headers.authentication as string;
     let payload: JwtPayload;
 
     try {
       payload = this.jwtService.verify(token);
+      await this.messageWsService.registerClient(client, payload.id);
     } catch (error) {
       client.disconnect();
       return;
     }
 
-    console.log(payload)
+    //console.log(payload)
     //console.log(`Cliente conectado: ${client.id}`);
-    this.messageWsService.registerClient(client);
     //console.log(`Conectados: ${this.messageWsService.getConnectedClients()}`);
 
     /** 
@@ -72,7 +72,7 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
 
     // Emitir mensaje a todos incluyendo a quién lo emitió
     this.server.emit('message-from-server', {
-      fullName: 'Yo',
+      fullName: this.messageWsService.getUserFullName(client.id),
       message: data.message,
     });
   }
