@@ -35,10 +35,6 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
       return;
     }
 
-    //console.log(payload)
-    //console.log(`Cliente conectado: ${client.id}`);
-    //console.log(`Conectados: ${this.messageWsService.getConnectedClients()}`);
-
     /** 
      * Informar a todos los clientes de la nueva conexión.
      * server.emit('nombre_del_event') evento que debe escuchar los clientes.
@@ -48,9 +44,7 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
 
   // Called automatically when a client disconnects
   handleDisconnect(client: Socket) {
-    //console.log(`Cliente desconectado: ${client.id}`);
     this.messageWsService.removeClient(client.id);
-    //console.log(`Conectados: ${this.messageWsService.getConnectedClients()}`);
     this.server.emit('clients-updated', this.messageWsService.getConnectedClients());
   }
 
