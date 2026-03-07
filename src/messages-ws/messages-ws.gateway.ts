@@ -1,4 +1,4 @@
-import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessageWsService } from './messages-ws.service';
 import { MessagesWsDto } from './dtos/messages-ws.dto';
@@ -41,9 +41,25 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
 
   // Escuchar al cliente
   @SubscribeMessage('message-from-client')
-  handleEvent(@MessageBody() data: MessagesWsDto): string {
-    console.log(` - ${data.message}`);
-    return data.message;
+  handleEvent(@ConnectedSocket() client: Socket, @MessageBody() data: MessagesWsDto) {
+
+    // Este mensaje es emitido al mismo cliente que lo envía
+    /* client.emit('message-from-server', {
+      fullName: 'Yo',
+      message: data.message,
+    }); */
+
+    // Emitir mensaje a todos los clientes menos a quién lo ha enviado
+    /* client.broadcast.emit('message-from-server', {
+      fullName: 'Yo',
+      message: data.message,
+    }); */
+
+    // Emitir mensaje a todos incluyendo a quién lo emitió
+    this.server.emit('message-from-server', {
+      fullName: 'Yo',
+      message: data.message,
+    });
   }
 
 }
